@@ -1,29 +1,37 @@
-int dfs(vector<int> adj[],vector<int>& vis,vector<int> &pathvis,int i){
-  vis[i]=1;
-  pathvis[i]=1;
-
-  for(auto it:adj[i]){
-    if(!vis[it]){
-      if(dfs(adj,vis,pathvis,it))return 1;
-    }
-    else if(pathvis[it]==1)return 1;
-  }
-  pathvis[i]=0;
-  return 0;
+#include<bits/stdc++.h>
+bool bfs(vector<int> adj[],vector<int>& vis,int node){
+	vis[node]=0;
+	queue<int> q;
+	q.push(node);
+	while(!q.empty()){
+		int i=q.front();
+		q.pop();
+		for(auto it:adj[i]){
+			if(vis[it]==-1){
+				vis[it]=!vis[i];
+				q.push(it);
+			}
+			else if(vis[it]==vis[i])return false;
+		}
+	}
+	return true;
 }
-int detectCycleInDirectedGraph(int n, vector < pair < int, int >> & edges) {
-  // Write your code here.
-  vector<int> adj[n+1];
-  for(auto it:edges){
-    adj[it.first].push_back(it.second);
-  }
-  vector<int> vis(n+1,0);
-  vector<int> pathvis(n+1,0);
+bool isGraphBirpatite(vector<vector<int>> &edges) {
+	// Write your code here.
+	vector<int> adj[edges.size()];
+	for(int i=0;i<edges.size();i++){
+		for(int j=0;j<edges[0].size();j++){
+			if(edges[i][j]==1){
+				adj[i].push_back(j);
+				adj[j].push_back(i);
+			}
+		}
+	}
 
-  for(int i=1;i<n+1;i++){
-    if(!vis[i]){
-      if(dfs(adj,vis,pathvis,i))return 1;
-    }
-  }
-  return 0;
+	vector<int> vis(edges.size(),-1);
+	for(int i=0;i<edges.size();i++){
+		if(vis[i]==-1){
+			return bfs(adj,vis,i);
+		}
+	}
 }
