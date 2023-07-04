@@ -1,61 +1,55 @@
 #include<bits/stdc++.h>
-
-void dfs1(unordered_map<int,vector<int>>&adj,stack<int>&stk,vector<bool>&vis,int curr) {
-    vis[curr]=true;
-    for(auto it:adj[curr]) {
-        if(!vis[it]) {
-            dfs1(adj,stk,vis,it);
-        }
+void dfs(int i,vector<int> &vis,stack<int> &st,vector<vector<int>> &adj){
+    vis[i]=1;
+    for(auto it: adj[i]){
+        if(!vis[it])dfs(it,vis,st,adj);
     }
-    stk.push(curr);
+    st.push(i);
 }
 
-void dfs2(unordered_map<int,vector<int>>&adj,vector<int>&tmp,vector<bool>&vis,int curr) {
+void dfs2(int curr,vector<vector<int>>&adj,vector<int>&tmp,vector<int>&vis) {
     vis[curr]=true;
     tmp.push_back(curr);
     for(auto it:adj[curr]) {
         if(!vis[it]) {
-            dfs2(adj,tmp,vis,it);
+            dfs2(it,adj,tmp,vis);
         }
     }
 }
-
-vector<vector<int>> stronglyConnectedComponents(int n, vector<vector<int>> &edges) {
-    
-    // Construct the graph
-    unordered_map<int,vector<int>>adj;
-    for (auto it : edges) {
-        adj[it[0]].push_back(it[1]);
+vector<vector<int>> stronglyConnectedComponents(int n, vector<vector<int>> &edges)
+{
+    // Write your code here.
+    vector<vector<int>> adj(n);
+    for(int i=0;i<edges.size();i++){
+        adj[edges[i][0]].push_back(edges[i][1]);
     }
-    
-    // Do a random order dfs and store vertices while backtracking
-    stack<int>stk;
-    vector<bool>vis(n,false);
-    for(int i=0;i<n;i++) {
-        if(!vis[i]) {
-            dfs1(adj,stk,vis,i);
+    vector<int> vis(n,0);
+    stack<int> st;
+    for(int i=0;i<n;i++){
+        if(!vis[i]){
+            dfs(i,vis,st,adj);
         }
     }
 
-    // Reverse the edges and construct a new graph
-    unordered_map<int,vector<int>>revAdj;
-    for (auto it : edges) {
-        revAdj[it[1]].push_back(it[0]);
+    vector<vector<int>> adj2(n);
+    for(int i=0;i<edges.size();i++){
+        adj2[edges[i][1]].push_back(edges[i][0]);
     }
+    vector<vector<int>> ans;
 
-    // Pop from stack and do dfs and store the SCCs
-    vector<vector<int>>ans;
-    fill(vis.begin(),vis.end(),false);
-    while(!stk.empty()) {
-        int node=stk.top();
-        stk.pop();
+    for(int i=0;i<n;i++)vis[i]=0;
+
+    while(!st.empty()) {
+        int node=st.top();
+        st.pop();
         if(!vis[node]) {
             vector<int>tmp;
-            dfs2(revAdj,tmp,vis,node);
+            dfs2(node,adj2,tmp,vis);
             ans.push_back(tmp);
         }
     }
 
-    // return the answer
     return ans;
+
+
 }
